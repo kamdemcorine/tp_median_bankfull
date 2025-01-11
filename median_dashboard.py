@@ -48,3 +48,58 @@ duration_month_boxplot = alt.Chart(data).mark_boxplot().encode(
   y='duration:Q', tooltip=['month', 'duration'] ).properties( 
   title='Durée des Appels en Fonction du Mois' ) 
 st.altair_chart(duration_month_boxplot, use_container_width=True)
+
+
+import streamlit as st
+import pandas as pd
+import altair as alt
+import joblib
+from sklearn.ensemble import RandomForestClassifier
+
+# Charger le modèle pré-entraîné
+model = joblib.load('random_forest_model.pkl')
+
+# Simulation des prédictions
+st.header('Simulation des Prédictions')
+st.write('Entrez les caractéristiques pour prédire la souscription :')
+
+# Créer des champs de saisie pour les caractéristiques
+age = st.number_input('Âge', min_value=18, max_value=100, value=30)
+job = st.selectbox('Travail', data['job'].unique())
+marital = st.selectbox('État civil', data['marital'].unique())
+education = st.selectbox('Niveau d\'éducation', data['education'].unique())
+default = st.selectbox('Défaut de crédit', ['yes', 'no'])
+balance = st.number_input('Solde', value=1000)
+housing = st.selectbox('Prêt immobilier', ['yes', 'no'])
+loan = st.selectbox('Prêt personnel', ['yes', 'no'])
+day = st.number_input('Jour de contact', min_value=1, max_value=31, value=15)
+month = st.selectbox('Mois de contact', data['month'].unique())
+duration = st.number_input('Durée de l\'appel (secondes)', value=300)
+campaign = st.number_input('Nombre de contacts pendant cette campagne', value=1)
+pdays = st.number_input('Nombre de jours depuis le dernier contact', value=-1)
+previous = st.number_input('Nombre de contacts avant cette campagne', value=0)
+
+# Créer un DataFrame avec les caractéristiques saisies
+input_data = pd.DataFrame({ 
+  'age': [age], 
+  'job': [job], 
+  'marital': [marital], 
+  'education': [education], 
+  'default': [default], 
+  'balance': [balance], 
+  'housing': [housing], 
+  'loan': [loan], 
+  'day': [day], 
+  'month': [month], 
+  'duration': [duration], 
+  'campaign': [campaign], 
+  'pdays': [pdays], 
+  'previous': [previous] })
+
+# Prédire la souscription 
+if st.button('Prédire'): 
+  prediction = model.predict(input_data) 
+  st.write(f'Prédiction : {"Souscription" if prediction[0] == "yes" else "Pas de souscription"}')
+
+
+
