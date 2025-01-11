@@ -3,7 +3,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import seaborn as sns
 import altair as alt
 import pydeck as pdk
 
@@ -15,39 +14,37 @@ st.title("Tableau de bord interactif - Bank Full dataset")
 st.header('Apercu du jeu de donnees')
 st.write(data.head())
 
-#Distribution des ages
-st.header('Distributuin des ages')
-fig,ax = plt.subplots()
-sns.histplot(data['age'], bins= 30, kde = True, ax = ax)
-ax.set_title('Distributuin des ages')
-ax.set_xlabel('Age')
-ax.set_yabel('Frequence')
-st.pyplot(fig)
+# Distribution des âges 
+st.header('Distribution des Âges') 
+age_hist = alt.Chart(data).mark_bar().encode( 
+  alt.X('age:Q', bin=alt.Bin(maxbins=30)), 
+  y='count()', 
+  tooltip=['age', 'count()'] ).properties( 
+  title='Distribution des Âges' ) 
+st.altair_chart(age_hist, use_container_width=True)
 
 # Taux de souscription en fonction du travail et du niveau d'éducation 
 st.header('Taux de Souscription en Fonction du Travail et du Niveau d\'Éducation') 
-fig, ax = plt.subplots(figsize=(12, 6)) 
-sns.countplot(x='job', hue='education', data=data, ax=ax) 
-ax.set_title('Taux de Souscription en Fonction du Travail et du Niveau d\'Éducation') 
-ax.set_xlabel('Travail') 
-ax.set_ylabel('Nombre de Souscriptions') 
-ax.legend(title='Niveau d\'Éducation') 
-st.pyplot(fig)
+job_education_chart = alt.Chart(data).mark_bar().encode( 
+  x='job:N', 
+  y='count()', 
+  color='education:N', 
+  tooltip=['job', 'education', 'count()'] ).properties( 
+  title='Taux de Souscription en Fonction du Travail et du Niveau d\'Éducation' ).interactive() 
+st.altair_chart(job_education_chart, use_container_width=True)
 
 #Répartition des soldes bancaires 
 st.header('Répartition des Soldes Bancaires') 
-fig, ax = plt.subplots() 
-sns.histplot(data['balance'], bins=30, kde=True, ax=ax) 
-ax.set_title('Répartition des Soldes Bancaires') 
-ax.set_xlabel('Solde') 
-ax.set_ylabel('Fréquence') 
-st.pyplot(fig)
+balance_hist = alt.Chart(data).mark_bar().encode( 
+  alt.X('balance:Q', bin=alt.Bin(maxbins=30)), 
+  y='count()', tooltip=['balance', 'count()'] ).properties( 
+  title='Répartition des Soldes Bancaires' ) 
+st.altair_chart(balance_hist, use_container_width=True)
 
 # Durée des appels en fonction du mois 
 st.header('Durée des Appels en Fonction du Mois') 
-fig, ax = plt.subplots(figsize=(12, 6)) 
-sns.boxplot(x='month', y='duration', data=data, ax=ax) 
-ax.set_title('Durée des Appels en Fonction du Mois') 
-ax.set_xlabel('Mois') 
-ax.set_ylabel('Durée (secondes)') 
-st.pyplot(fig)
+duration_month_boxplot = alt.Chart(data).mark_boxplot().encode( 
+  x='month:N', 
+  y='duration:Q', tooltip=['month', 'duration'] ).properties( 
+  title='Durée des Appels en Fonction du Mois' ) 
+st.altair_chart(duration_month_boxplot, use_container_width=True)
